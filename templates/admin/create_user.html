@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create User</title>
+</head>
+<body>
+    <h1>Create User</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <p>{{ form.balance.label }}: {{ form.balance }}</p>
+        <p>{{ form.commission_rate.label }}: {{ form.commission_rate }}</p>
+        <p>{{ form.webhook_url.label }}: {{ form.webhook_url }}</p>
+        <p>{{ form.role.label }}: {{ form.role }}</p>
+        <p>{{ form.submit }}</p>
+    </form>
+</body>
+</html>
