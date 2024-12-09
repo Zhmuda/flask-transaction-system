@@ -6,3 +6,4 @@ Flask-WTF
 Flask-Swagger-UI
 Celery
 redis
+Flasgger
