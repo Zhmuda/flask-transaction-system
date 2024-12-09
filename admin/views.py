@@ -1,13 +1,20 @@
-from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
-from flask_login import current_user
+from flask import render_template, redirect, url_for, flash, request
+from app.admin.forms import UserForm
+from app.models import User
+from app import db
 
-class SecureModelView(ModelView):
-    def is_accessible(self):
-        return current_user.is_authenticated and current_user.role == 'admin'
-
-def setup_admin(app):
-    admin = Admin(app, name='Admin Panel', template_mode='bootstrap4')
-    from app.models import db, User, Transaction
-    admin.add_view(SecureModelView(User, db.session))
-    admin.add_view(SecureModelView(Transaction, db.session))
+@admin_bp.route('/users/create', methods=['GET', 'POST'])
+def create_user():
+    form = UserForm()
+    if form.validate_on_submit():
+        user = User(
+            balance=form.balance.data,
+            commission_rate=form.commission_rate.data,
+            webhook_url=form.webhook_url.data,
+            role=form.role.data
+        )
+        db.session.add(user)
+        db.session.commit()
+        flash('User created successfully', 'success')
+        return redirect(url_for('admin.users'))
+    return render_template('admin/create_user.html', form=form)
