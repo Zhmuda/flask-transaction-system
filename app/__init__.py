@@ -1,27 +1,28 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_admin import Admin
 from flask_wtf.csrf import CSRFProtect
-from app.models import db
-from app.admin.views import setup_admin
-from app.api.views import api
+from flasgger import Swagger
 
+db = SQLAlchemy()
 csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
 
-    # Инициализация расширений
     db.init_app(app)
-    Migrate(app, db)
     csrf.init_app(app)
+    Swagger(app)
 
-    # Подключение админки
-    setup_admin(app)
+    with app.app_context():
+        from .routes import bp as main_routes
+        from .api.views import bp as api_routes
+        from .admin.views import admin_bp
 
-    # Регистрация Blueprint'ов
-    app.register_blueprint(api, url_prefix='/api')
+        app.register_blueprint(main_routes)
+        app.register_blueprint(api_routes, url_prefix='/api')
+        app.register_blueprint(admin_bp, url_prefix='/admin')
+
+        db.create_all()
 
     return app
